@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+function App () {
+    const [blogs, setBlogs] = useState([]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    useEffect (() => {
+      fetch ("http://localhost:1337/api/blogs?populate=*")
+      .then ((res) => res.json ())
+      .then ((data) => {
+         console.log("Strapi Blogs", data.data);
+         setBlogs (data.data);
+         console.log (
+          `http://localhost:1337/${data.data[0].attributes.Image.data[0].attributes.url}`);
+      });
+     
+    },[]);
+    
 
-export default App
+
+  return ( 
+  <> 
+<section className="max-w-[600px] p-20 mx-auto">
+  {blogs.map((blog) =>(
+    // eslint-disable-next-line react/jsx-key
+    <div className="shadow mb-5 p-10">
+    <h2 className="text-3xl"> {blog.attributes.Title} </h2>
+    <p>{blog.attributes.Description}</p>
+    <img
+    src={`http://localhost:1337/${blog.attributes.Image.data[0].attributes.url}`} alt=""
+/>    
+    </div>
+
+  ))}
+</section>
+
+  </>
+);
+} 
+export default App;
